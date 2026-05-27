@@ -1,353 +1,470 @@
 # Quadcopter Image Detection
 
-A computer vision project for detecting quadcopters in images using image processing and machine learning techniques. The project is designed to identify quadcopters from visual input and can be extended for drone monitoring, object detection, surveillance, robotics, and autonomous system applications.
+A Webots-based autonomous quadcopter simulation that combines drone control, image processing, and a CNN classifier to identify target boxes from camera images and trigger landing when the correct destination is detected.
 
 ---
 
-## Table of Contents
+## Overview
 
-- [Project Overview](#project-overview)
-- [Purpose of the Project](#purpose-of-the-project)
-- [Key Features](#key-features)
-- [How the System Works](#how-the-system-works)
-- [Computer Vision Pipeline](#computer-vision-pipeline)
-- [Technologies Used](#technologies-used)
-- [Project Structure](#project-structure)
-- [Installation](#installation)
-- [How to Run](#how-to-run)
-- [Dataset](#dataset)
-- [Model Training](#model-training)
-- [Evaluation](#evaluation)
-- [Applications](#applications)
-- [Future Improvements](#future-improvements)
-- [Author](#author)
-- [License](#license)
+This project demonstrates an autonomous quadcopter workflow using the **Webots robotics simulator** and a **Python-based computer vision pipeline**. A simulated Mavic 2 Pro drone follows a set of predefined waypoints, captures images using its onboard camera, processes the captured images, classifies the detected target using a trained CNN model, and lands when the predicted target matches the required destination.
 
----
+The project connects three main areas:
 
-## Project Overview
+- **Robotics simulation** using Webots
+- **Image processing** using OpenCV
+- **Machine learning classification** using TensorFlow/Keras
 
-Quadcopters and drones are increasingly used in areas such as aerial photography, delivery systems, environmental monitoring, robotics, and security. As their usage grows, detecting quadcopters accurately from images becomes an important computer vision task.
-
-This project focuses on building an image detection system that can identify quadcopters from visual data. The system can be used as a foundation for object detection pipelines where the goal is to process images, locate target objects, and support automated decision-making.
-
-The project demonstrates important computer vision concepts such as image preprocessing, feature extraction, object detection, model training, and performance evaluation.
-
----
-
-## Purpose of the Project
-
-The main goal of this project is to detect quadcopters in image data using a structured computer vision workflow. The system can support tasks such as:
-
-- Detecting whether a quadcopter is present in an image
-- Supporting object detection experiments for drone-related datasets
-- Preparing a foundation for real-time drone detection
-- Applying machine learning or deep learning methods to visual recognition problems
-- Demonstrating practical computer vision skills in a portfolio project
+Rather than being only a static image classification project, this repository shows how image detection can be integrated into a drone navigation and decision-making loop.
 
 ---
 
 ## Key Features
 
-- Image-based quadcopter detection
-- Computer vision preprocessing workflow
-- Support for machine learning or deep learning detection models
-- Clean structure for dataset preparation and experimentation
-- Suitable for extension into real-time detection
-- Useful for robotics, surveillance, and autonomous systems projects
-- Easy to adapt for other object detection tasks
+- Simulated Mavic 2 Pro quadcopter in Webots
+- Autonomous waypoint-based drone navigation
+- Camera-based image capture from the simulated environment
+- Image preprocessing pipeline using grayscale conversion, cropping, resizing, erosion, and Laplacian enhancement
+- CNN model trained on 28×28 grayscale image data
+- Saved Keras model for prediction
+- Classification-based destination detection
+- Automatic landing when the target destination is identified
+- Jupyter notebooks for model training, image processing, and prediction testing
+- Python controller for connecting Webots drone control with the trained model
 
 ---
 
-## How the System Works
+## Project Workflow
 
-The project follows a typical object detection workflow.
+The complete system works as follows:
 
-1. **Collect image data** containing quadcopters and non-quadcopter examples.
-2. **Preprocess images** by resizing, normalizing, cleaning, or converting them into a suitable format.
-3. **Extract useful visual features** or prepare images for a detection model.
-4. **Train or apply a model** to identify quadcopters in images.
-5. **Evaluate detection performance** using appropriate computer vision metrics.
-6. **Generate predictions** showing whether a quadcopter is detected and, if applicable, where it appears in the image.
-
----
-
-## Computer Vision Pipeline
-
-A typical pipeline for this project can include the following stages.
-
-### 1. Image Input
-
-Images are loaded from a local dataset, camera source, or test folder.
-
-### 2. Preprocessing
-
-Before detection, images may be processed using operations such as:
-
-- Resizing
-- Normalization
-- Noise reduction
-- Colour space conversion
-- Data augmentation
-- Label formatting
-
-### 3. Detection Model
-
-The detection stage may use either classical computer vision methods or deep learning-based object detection models.
-
-Possible approaches include:
-
-- Traditional feature-based detection
-- Convolutional Neural Networks (CNNs)
-- YOLO-style object detection
-- Faster R-CNN-style object detection
-- Transfer learning using pretrained models
-
-### 4. Prediction
-
-The trained or selected model predicts whether a quadcopter appears in the image. For object detection models, the output may also include bounding boxes and confidence scores.
-
-### 5. Output Visualization
-
-The system can display or save prediction results, including:
-
-- Detected class name
-- Confidence score
-- Bounding box location
-- Annotated image output
+1. The quadcopter starts inside the Webots simulation world.
+2. The drone takes off and reaches a target altitude.
+3. It moves through a sequence of predefined waypoints.
+4. At each target area, the camera captures an image of the box or visual marker.
+5. The captured image is converted to grayscale and cropped.
+6. Image processing filters are applied to improve visual detail.
+7. The processed image is resized to 28×28 pixels.
+8. The trained CNN model predicts the class of the captured target.
+9. The predicted class is mapped to a box/destination number.
+10. If the predicted destination matches the required destination, the drone starts landing.
+11. Once landing is complete, the controller stops the motors.
 
 ---
 
-## Technologies Used
-
-This project can be implemented using Python and computer vision libraries such as:
-
-- Python
-- OpenCV
-- NumPy
-- Matplotlib
-- TensorFlow or PyTorch
-- Scikit-learn
-- Jupyter Notebook
-- Pillow
-
-Depending on the final implementation, additional object detection frameworks may also be used, such as:
-
-- YOLO
-- Detectron2
-- TensorFlow Object Detection API
-- torchvision detection models
-
----
-
-## Project Structure
-
-A recommended structure for this repository is shown below:
+## Repository Structure
 
 ```text
-Quadcopter-Image-Detection/
+Quadcopter Image Detection/
 │
-├── data/                  # Image dataset and labels
-│   ├── train/             # Training images
-│   ├── validation/        # Validation images
-│   └── test/              # Test images
+├── cnn/
+│   ├── cnn.ipynb
+│   ├── image_processing.ipynb
+│   └── predict.ipynb
 │
-├── notebooks/             # Jupyter notebooks for experiments
-├── src/                   # Source code for preprocessing, training, and detection
-├── models/                # Saved trained models or weights
-├── outputs/               # Detection results and annotated images
-├── requirements.txt       # Python dependencies
-└── README.md              # Project documentation
+├── controllers/
+│   ├── mavic2pro/
+│   │   ├── Makefile
+│   │   ├── mavic2pro.c
+│   │   └── mavic2pro.exe
+│   │
+│   └── my_controller/
+│       ├── my_controller.py
+│       └── predict.py
+│
+├── datasets/
+│   ├── train.csv
+│   ├── test.csv
+│   ├── box1/
+│   ├── box2/
+│   ├── box3/
+│   ├── box4/
+│   ├── box5/
+│   └── image_processing/
+│
+├── images/
+│   ├── 0_highres.jpg
+│   ├── 1_highres.jpg
+│   ├── 2_highres.jpg
+│   ├── 5_highres.jpg
+│   └── 8_highres.jpg
+│
+├── model/
+│   └── location.keras
+│
+├── worlds/
+│   └── mavic_2_pro.wbt
+│
+└── README.md
 ```
-
-The repository can be adjusted depending on whether the implementation is notebook-based, script-based, or built as a complete application.
 
 ---
 
-## Installation
+## Main Components
 
-Follow these steps to run the project locally.
+### 1. Webots Simulation
 
-### 1. Clone the repository
+The `worlds/` folder contains the Webots world file:
 
-```bash
-git clone https://github.com/farbodfld/Quadcopter-Image-Detection.git
+```text
+worlds/mavic_2_pro.wbt
 ```
 
-### 2. Move into the project directory
+This world defines the simulation environment where the quadcopter operates. The project uses a simulated Mavic 2 Pro drone with devices such as:
 
-```bash
-cd Quadcopter-Image-Detection
-```
-
-### 3. Create a virtual environment
-
-```bash
-python -m venv venv
-```
-
-### 4. Activate the virtual environment
-
-For Windows:
-
-```bash
-venv\Scripts\activate
-```
-
-For macOS/Linux:
-
-```bash
-source venv/bin/activate
-```
-
-### 5. Install dependencies
-
-If a `requirements.txt` file is available, run:
-
-```bash
-pip install -r requirements.txt
-```
-
-If dependencies are not listed yet, install the common computer vision packages manually:
-
-```bash
-pip install opencv-python numpy matplotlib pillow scikit-learn jupyter
-```
-
-For deep learning-based detection, install either TensorFlow or PyTorch depending on the model used.
+- Camera
+- GPS
+- Gyroscope
+- Inertial measurement unit
+- Propeller motors
+- LEDs
+- Camera pitch motor
 
 ---
 
-## How to Run
+### 2. Drone Controller
 
-If the project is notebook-based, start Jupyter Notebook:
+The main Python controller is located at:
 
-```bash
-jupyter notebook
+```text
+controllers/my_controller/my_controller.py
 ```
 
-Then open the notebook file and run the cells in order.
+This file controls the drone movement and decision-making process. It handles:
 
-If the project uses Python scripts, a common workflow may look like this:
+- Drone takeoff
+- Altitude control
+- Roll, pitch, and yaw stabilization
+- Waypoint navigation
+- Camera image capture
+- Calling the prediction pipeline
+- Checking whether the detected target matches the desired destination
+- Triggering landing when the correct target is detected
 
-```bash
-python src/preprocess.py
-python src/train.py
-python src/detect.py
+The controller uses proportional control constants for stabilizing movement and keeping the drone at the desired altitude.
+
+---
+
+### 3. Prediction Pipeline
+
+The prediction helper file is located at:
+
+```text
+controllers/my_controller/predict.py
 ```
 
-For testing a single image, the command may look like:
+This script loads the trained Keras model from:
 
-```bash
-python src/detect.py --image path/to/image.jpg
+```text
+model/location.keras
 ```
 
-The exact command may be updated once the final implementation files are added to the repository.
+It processes captured images and predicts the target class. The prediction flow includes:
+
+- Reading the captured box image
+- Converting the image to grayscale
+- Cropping the region of interest
+- Resizing the cropped image to 28×28 pixels
+- Passing the image into the CNN model
+- Mapping the predicted label to a box/destination number
+
+---
+
+### 4. CNN Model Training
+
+The CNN model is trained in:
+
+```text
+cnn/cnn.ipynb
+```
+
+The notebook loads the dataset from:
+
+```text
+datasets/train.csv
+datasets/test.csv
+```
+
+The dataset contains labelled 28×28 grayscale images stored in CSV format. Each row contains a class label followed by 784 pixel values.
+
+The CNN architecture includes:
+
+- Convolutional layers
+- Max pooling layers
+- Flatten layer
+- Dense hidden layer
+- Softmax output layer
+
+The trained model is saved as:
+
+```text
+model/location.keras
+```
+
+---
+
+### 5. Image Processing Experiments
+
+The notebook below applies image processing filters to cropped target images:
+
+```text
+cnn/image_processing.ipynb
+```
+
+The image processing steps include:
+
+- Grayscale image loading
+- Minimum filtering using erosion
+- Maximum filtering using dilation
+- Laplacian filtering for detail enhancement
+- Saving processed outputs for comparison
+
+Processed images are stored under:
+
+```text
+datasets/image_processing/
+```
+
+---
+
+### 6. Prediction Notebook
+
+The prediction notebook is located at:
+
+```text
+cnn/predict.ipynb
+```
+
+It is used for testing the trained model on processed images from the box folders. It follows a similar workflow to the controller prediction logic and helps validate the image preprocessing and model prediction process before integrating it into Webots.
 
 ---
 
 ## Dataset
 
-The dataset should contain images of quadcopters and, if required, images without quadcopters for comparison. For object detection, the dataset should also include labels or annotations.
+The project includes two CSV datasets:
 
-A typical dataset may include:
+```text
+datasets/train.csv
+datasets/test.csv
+```
 
-- Training images
-- Validation images
-- Test images
-- Class labels
-- Bounding box annotations
+Each dataset row follows this structure:
 
-Possible annotation formats include:
+```text
+label, pixel1, pixel2, pixel3, ..., pixel784
+```
 
-- YOLO format
-- Pascal VOC XML
-- COCO JSON
-- CSV-based bounding box labels
+This means each image is represented as a 28×28 grayscale image flattened into 784 pixel values.
 
-Good dataset quality is important because detection accuracy depends heavily on image variety, lighting conditions, camera angles, object size, background complexity, and label accuracy.
+The project also includes box image folders:
+
+```text
+datasets/box1/
+datasets/box2/
+datasets/box3/
+datasets/box4/
+datasets/box5/
+```
+
+These folders store captured and processed images for different target boxes. The saved versions include original images, grayscale images, cropped images, filtered images, Laplacian-enhanced images, and resized images.
 
 ---
 
-## Model Training
+## Model Classes
 
-The model training process may include:
+The CNN classifier uses five output classes:
 
-1. Loading labelled images
-2. Splitting data into training, validation, and test sets
-3. Applying image augmentation
-4. Training the detection model
-5. Monitoring loss and accuracy
-6. Saving the trained model
-7. Testing the model on unseen images
+```python
+class_dict = {
+    0: "T-shirt",
+    1: "pants",
+    2: "pullover",
+    3: "shoes",
+    4: "Bag"
+}
+```
 
-For stronger performance, transfer learning can be used with a pretrained computer vision model. This allows the system to benefit from features learned from large-scale image datasets.
+These predicted classes are then mapped to destination boxes:
+
+```python
+box_dict = {
+    "T-shirt": 1,
+    "pants": 5,
+    "pullover": 2,
+    "shoes": 4,
+    "Bag": 3
+}
+```
+
+This mapping allows the controller to convert CNN predictions into physical target destinations inside the Webots simulation.
+
+---
+
+## Technologies Used
+
+- Python
+- Webots
+- TensorFlow / Keras
+- OpenCV
+- NumPy
+- Pandas
+- Matplotlib
+- Pillow
+- Jupyter Notebook
+- C controller files for Webots reference/control support
+
+---
+
+## Installation
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/farbodfld/Quadcopter-Image-Detection.git
+cd Quadcopter-Image-Detection
+```
+
+### 2. Create a virtual environment
+
+```bash
+python -m venv venv
+```
+
+Activate it:
+
+Windows:
+
+```bash
+venv\Scripts\activate
+```
+
+macOS/Linux:
+
+```bash
+source venv/bin/activate
+```
+
+### 3. Install Python dependencies
+
+```bash
+pip install numpy pandas opencv-python matplotlib pillow tensorflow keras jupyter
+```
+
+### 4. Install Webots
+
+Download and install Webots from the official Cyberbotics website. After installation, make sure Python controllers are correctly configured in Webots.
+
+---
+
+## How to Run the Project
+
+### Run the Webots Simulation
+
+1. Open Webots.
+2. Open the world file:
+
+```text
+worlds/mavic_2_pro.wbt
+```
+
+3. Make sure the controller is set to:
+
+```text
+my_controller
+```
+
+4. Start the simulation.
+
+The drone should take off, move between waypoints, capture images, classify the detected target, and land when the desired destination is found.
+
+---
+
+## How to Train the CNN Model
+
+Open the notebook:
+
+```text
+cnn/cnn.ipynb
+```
+
+Run the cells in order. The notebook performs the following steps:
+
+1. Loads `train.csv` and `test.csv`
+2. Separates labels and pixel values
+3. Reshapes images into 28×28×1 format
+4. Normalizes pixel values
+5. Converts labels to categorical format
+6. Builds the CNN model
+7. Trains the model
+8. Evaluates test accuracy
+9. Saves the model to `model/location.keras`
+
+---
+
+## Image Processing Steps
+
+The image preprocessing pipeline used before prediction includes:
+
+1. Read image from a box folder
+2. Convert image to grayscale
+3. Crop the relevant region
+4. Apply erosion/minimum filtering
+5. Apply Laplacian enhancement
+6. Resize image to 28×28 pixels
+7. Send the processed image to the CNN model
+
+This preprocessing is important because the trained model expects small grayscale images with the same format as the training dataset.
+
+---
+
+## Example Prediction Flow
+
+A simplified version of the prediction logic is:
+
+```python
+image = cv2.imread("box_image.jpg", cv2.IMREAD_GRAYSCALE)
+cropped = image[row_start:row_end, col_start:col_end]
+filtered = cv2.erode(cropped, None)
+enhanced = apply_laplacian_filter(filtered)
+resized = resize_image(enhanced, (28, 28))
+prediction = model.predict(np.array([resized]))
+```
+
+The final predicted class is mapped to a destination box. If the destination matches the target, the drone begins landing.
 
 ---
 
 ## Evaluation
 
-The model can be evaluated using common classification and object detection metrics.
+The model is evaluated in `cnn/cnn.ipynb` using test accuracy after training. For future improvement, the following metrics could also be added:
 
-### Classification Metrics
-
-If the task is to detect whether a quadcopter exists in an image:
-
-- Accuracy
+- Confusion matrix
 - Precision
 - Recall
 - F1-score
-- Confusion matrix
-
-### Object Detection Metrics
-
-If the task includes locating quadcopters with bounding boxes:
-
-- Intersection over Union (IoU)
-- Mean Average Precision (mAP)
-- Precision-Recall curve
-- Detection confidence score
-- False positive and false negative analysis
-
-These metrics help measure how accurately the system detects quadcopters and how well it avoids incorrect detections.
-
----
-
-## Applications
-
-This project can be extended for several real-world and research applications:
-
-- Drone detection and monitoring
-- Security and surveillance systems
-- Autonomous navigation systems
-- Robotics perception
-- Airspace monitoring
-- Smart camera systems
-- Computer vision education and experimentation
+- Per-class accuracy
+- Prediction confidence visualization
+- Comparison of preprocessing filters
 
 ---
 
 ## Future Improvements
 
-Possible future improvements include:
-
-- Add a larger and more diverse quadcopter image dataset
-- Implement real-time video detection
-- Train a YOLO-based object detection model
-- Add bounding box visualization for detected quadcopters
-- Create a simple web dashboard for uploading and testing images
-- Add model performance reports and visual plots
-- Deploy the model using FastAPI, Flask, or Streamlit
-- Add GPU support for faster training and inference
-- Improve detection under low-light, blurry, or complex background conditions
+- Replace manual crop coordinates with automatic object detection
+- Train the model on custom target images from the Webots environment
+- Add real-time camera frame prediction instead of saved-image prediction
+- Improve dataset consistency between training classes and simulated target boxes
+- Add confusion matrix and detailed evaluation report
+- Add requirements.txt for easier setup
+- Add screenshots or GIFs of the Webots simulation
+- Add command-line arguments for selecting destination target
+- Improve path handling to make the project portable across operating systems
+- Deploy the prediction model as a small API or dashboard
 
 ---
 
-## Repository Description
+## Suggested GitHub Description
 
-**Suggested GitHub description:**
-
-> A computer vision project for detecting quadcopters in images using image processing and machine learning techniques.
+**Autonomous Webots quadcopter simulation using image processing and a CNN model to classify visual targets and trigger landing at the correct destination.**
 
 ---
 
@@ -359,4 +476,4 @@ Developed by [farbodfld](https://github.com/farbodfld)
 
 ## License
 
-This project is intended for educational and portfolio purposes. If a specific license is required, add a `LICENSE` file to the repository.
+This project is intended for educational and research purposes. Add a `LICENSE` file if you want to define formal usage permissions.
