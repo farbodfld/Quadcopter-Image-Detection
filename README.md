@@ -462,18 +462,8 @@ The model is evaluated in `cnn/cnn.ipynb` using test accuracy after training. Fo
 
 ---
 
-## Suggested GitHub Description
-
-**Autonomous Webots quadcopter simulation using image processing and a CNN model to classify visual targets and trigger landing at the correct destination.**
-
----
-
 ## Author
 
 Developed by [farbodfld](https://github.com/farbodfld)
 
 ---
-
-## License
-
-This project is intended for educational and research purposes. Add a `LICENSE` file if you want to define formal usage permissions.
